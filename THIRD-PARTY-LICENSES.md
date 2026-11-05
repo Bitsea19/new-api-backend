@@ -1,12 +1,15 @@
-# Third-Party Licenses
+# 第三方许可证
 
-This file summarizes direct third-party dependencies used by distributed builds of this project.
-It is an engineering compliance artifact and should be kept with Docker images, standalone binaries, frontend bundles, and Electron installers.
+本文件汇总本项目对外分发构建所使用的直接第三方依赖。
+这是一份工程合规材料，应当随 Docker 镜像、独立二进制、前端资源包与 Electron 安装包一同保留。
 
-Scope: direct dependencies from `go.mod` (including the in-repo `relaykit` and `tokenkit` modules), `web/package.json`, and `electron/package.json`.
-Transitive dependencies should be audited before a final external release.
+范围：`go.mod`（含仓库内的 `relaykit` 与 `tokenkit` 模块）、前端仓库的 `package.json`，以及 `electron/package.json`。
+对外正式发布前应另行审计传递依赖。
 
-## Dependency Inventory
+> **注**：前端已迁移到独立仓库 `new-api-web`，其依赖清单见该仓库的 `THIRD-PARTY-LICENSES.md`。
+> 下表中标记为 `web` 的行保留下来，是为了让本仓库的历史构建记录仍然可追溯。
+
+## 依赖清单
 
 | Area     | Scope       | Ecosystem | Dependency                                              | Version                              | License                 |
 |----------|-------------|-----------|---------------------------------------------------------|--------------------------------------|-------------------------|
@@ -168,7 +171,7 @@ Transitive dependencies should be audited before a final external release.
 | electron | development | npm       | `electron`                                              | `41.10.6`                            | MIT                     |
 | electron | development | npm       | `electron-builder`                                      | `26.15.3`                            | MIT                     |
 
-## License Texts
+## 许可证原文
 
 ### Apache-2.0
 
@@ -190,7 +193,7 @@ the License.
 
 ### Apache-2.0 OR MIT
 
-Dual-licensed components may be used under Apache-2.0 or MIT. Both standard license texts are included below.
+双许可组件可按 Apache-2.0 或 MIT 使用。下面同时给出两份标准许可证原文。
 
 Apache License
 Version 2.0, January 2004
@@ -325,26 +328,23 @@ SOFTWARE.
 Mozilla Public License 2.0
 https://mozilla.org/MPL/2.0/
 
-The source code of the MPL-covered files is available from the upstream project at https://github.com/go-sql-driver/mysql.
+MPL 覆盖文件的源码可从上游项目获取：https://github.com/go-sql-driver/mysql 。
 
 ### OFL-1.1
 
 SIL Open Font License 1.1
 
-The font dependency listed under OFL-1.1 is licensed under the SIL Open Font
-License, Version 1.1. The full license text is available at:
+标记为 OFL-1.1 的字体依赖依据 SIL Open Font License 1.1 授权。完整许可证原文见：
 https://openfontlicense.org/open-font-license-official-text/
 
-When distributing font files, preserve the OFL license text, copyright notices,
-and reserved font name restrictions supplied by the upstream font project.
+分发字体文件时，请保留上游字体项目提供的 OFL 许可证原文、版权声明与保留字体名称限制。
 
 ### Unlicense
 
 The Unlicense
 
-This is free and unencumbered software released into the public domain.
-Anyone is free to copy, modify, publish, use, compile, sell, or distribute
-this software, either in source code form or as a compiled binary, for any
-purpose, commercial or non-commercial, and by any means.
+这是自由且不受约束的软件，已 released into the public domain（公有领域）。
+任何人可以出于任何目的（商业或非商业），以任何方式复制、修改、发布、使用、编译、销售或分发本软件，
+无论以源码形式还是编译后的二进制形式。
 
-For more information, please refer to https://unlicense.org/
+更多信息见 https://unlicense.org/

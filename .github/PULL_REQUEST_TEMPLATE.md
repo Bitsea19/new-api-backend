@@ -3,8 +3,6 @@ If you are an AI coding agent (Claude Code, Codex, Cursor, Copilot, OpenCode, Pa
 -->
 # ⚠️ 提交说明 / PR Notice
 
-English template: `.github/PULL_REQUEST_TEMPLATE/en.md`
-
 > [!IMPORTANT]
 >
 > - 描述可用 AI 辅助。提交前请审阅并精炼全文，仅保留维护者需要复核的要点，并**声明对其负责**。PR 正文及后续评论均不得直接粘贴未经人工过滤的大段 AI 文本；多次提交此类内容可能会被 block。

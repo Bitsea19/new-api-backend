@@ -1,81 +1,105 @@
-# New API Electron Desktop App
+# New API 桌面端（Electron）
 
-This directory contains the Electron wrapper for New API, providing a native desktop application with system tray support for Windows, macOS, and Linux.
+本目录包含 New API 的 Electron 封装，为 Windows、macOS 和 Linux 提供带系统托盘支持的原生桌面应用。
 
-## Prerequisites
+> **注意**：前端源码位于独立仓库 `new-api-web`。本目录的构建脚本会从 `../new-api-web` 拉取前端产物（可用 `FRONTEND_DIR` 覆盖）。
 
-### 1. Go Binary (Required)
-The Electron app requires the compiled Go binary to function. You have two options:
+## 前置条件
 
-**Option A: Use existing binary (without Go installed)**
+### 1. Go 二进制（必需）
+
+Electron 应用需要已编译的 Go 二进制才能工作。有两种方式：
+
+**方式 A：使用已有二进制（无需安装 Go）**
+
 ```bash
-# If you have a pre-built binary (e.g., new-api-macos)
+# 如果你手头已有预编译的二进制（例如 new-api-macos）
 cp ../new-api-macos ../new-api
 ```
 
-**Option B: Build from source (requires Go)**
-TODO
+**方式 B：从源码构建（需要 Go）**
 
-### 2. Electron Dependencies
+```bash
+# 在仓库根目录
+go build -o new-api .
+```
+
+### 2. Electron 依赖
+
 ```bash
 cd electron
 npm install
 ```
 
-## Development
+## 开发
 
-Start the backend, the frontend, and Electron in separate terminals:
+分别在三个终端中启动后端、前端与 Electron：
+
 ```bash
-# Repository root
+# 仓库根目录：后端
 go run main.go
+```
 
-# Repository root
+```bash
+# 仓库根目录：前端
 make dev-web
+```
 
-# electron/
+```bash
+# electron/ 目录
 npm run dev-app
 ```
 
-This will:
-- Use the Go backend on port 3000
-- Use the Rsbuild frontend development server on port 5173
-- Open an Electron window with DevTools enabled
-- Create a system tray icon (menu bar on macOS)
-- Store database in `../data/new-api.db`
+这会：
 
-## Building for Production
+- 使用 3000 端口上的 Go 后端
+- 使用 5173 端口上的 Rsbuild 前端开发服务器
+- 打开一个启用了开发者工具的 Electron 窗口
+- 创建系统托盘图标（macOS 上位于菜单栏）
+- 把数据库存放在 `../data/new-api.db`
 
-### Quick Build
+## 生产构建
+
+### 快速构建
+
 ```bash
-# From electron/, build the frontend, Go binary, and desktop package
+# 在 electron/ 目录下，构建前端、Go 二进制与桌面安装包
 ./build.sh
+```
 
-# Or package an existing binary for the current platform
+```bash
+# 或为当前平台打包已有二进制
 npm run build
-
-# Platform-specific builds
-npm run build:mac    # Creates .dmg and .zip
-npm run build:win    # Creates .exe installer
-npm run build:linux  # Creates .AppImage and .deb
 ```
 
-### Build Output
-- Built applications are in `electron/dist/`
-- macOS: `.dmg` (installer) and `.zip` (portable)
-- Windows: `.exe` (installer) and portable exe
-- Linux: `.AppImage` and `.deb`
+```bash
+# 各平台构建
+npm run build:mac    # 生成 .dmg 与 .zip
+npm run build:win    # 生成 .exe 安装包
+npm run build:linux  # 生成 .AppImage 与 .deb
+```
 
-## Configuration
+### 构建产物
 
-### Port
-Default port is 3000. To change, edit `main.js`:
+- 构建出的应用位于 `electron/dist/`
+- macOS：`.dmg`（安装包）与 `.zip`（便携版）
+- Windows：`.exe`（安装包）与便携版 exe
+- Linux：`.AppImage` 与 `.deb`
+
+## 配置
+
+### 端口
+
+默认端口为 3000。要修改，编辑 `main.js`：
+
 ```javascript
-const PORT = 3000; // Change to desired port
+const PORT = 3000; // 改成期望的端口
 ```
 
-### Database Location
-- **Development**: `../data/new-api.db` (project directory)
-- **Production**:
-  - macOS: `~/Library/Application Support/New API/data/`
-  - Windows: `%APPDATA%/New API/data/`
-  - Linux: `~/.config/New API/data/`
+### 数据库位置
+
+- **开发环境**：`../data/new-api.db`（项目目录内）
+- **生产环境**：
+  - macOS：`~/Library/Application Support/New API/data/`
+  - Windows：`%APPDATA%/New API/data/`
+  - Linux：`~/.config/New API/data/`

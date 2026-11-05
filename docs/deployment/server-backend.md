@@ -4,6 +4,12 @@
 
 本文说明如何把后端源码上传到服务器，并在服务器上**本地构建镜像**，不使用远程的 `calciumion/new-api:latest`。
 
+> **本仓库是 [QuantumNous/new-api](https://github.com/QuantumNous/new-api) 的二开版本**，主要改动是把前端
+> 面板完全剥离、后端默认编译为纯 API 服务。因此**不能**直接使用 Docker Hub 上的官方镜像 ——
+> 官方镜像不含 `FRONTEND_BASE_URL`、自定义 CORS 等分离部署能力。
+>
+> 配套前端仓库：[new-api-web](https://github.com/你的用户名/new-api-web)。
+
 ---
 
 ## 1. 架构
@@ -207,5 +213,3 @@ docker compose up -d --build
 ```bash
 docker buildx build --cache-from=type=registry,ref=your-registry/new-api:cache .
 ```
-
-> 📌 用好这个指南，方便新老用户快速部署。参考 Claude/ChatGPT 官方文档的写法风格。
