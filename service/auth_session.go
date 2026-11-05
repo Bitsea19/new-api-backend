@@ -15,6 +15,24 @@ import (
 
 const RefreshCookieName = "new_api_refresh"
 
+// RefreshCookiePath scopes the Refresh Cookie to the only path that ever
+// sends it.
+//
+// The cookie is HttpOnly and only the refresh and logout endpoints read it,
+// so narrowing the Path keeps it away from every other request the browser
+// makes to this origin.
+const RefreshCookiePath = "/api/user/auth"
+
+// SessionHintCookiePath scopes the script-readable session hint.
+//
+// The hint is read by the frontend's own scripts, which live on the
+// frontend's origin. In a same-origin deployment the frontend's origin is
+// this origin, so "/" is what makes it readable. In a separated deployment
+// the frontend is on a different origin and no Path can make a cookie
+// readable across origins — the frontend mirrors the hint into localStorage
+// there instead.
+const SessionHintCookiePath = "/"
+
 // SessionHintCookieName is the script-readable companion to RefreshCookieName.
 // See writeSessionHintCookie for why it exists and what it is not.
 const SessionHintCookieName = "new_api_has_session"
@@ -333,12 +351,12 @@ func WriteRefreshCookie(c *gin.Context, rawToken string) {
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     RefreshCookieName,
 		Value:    rawToken,
-		Path:     "/api/user/auth",
+		Path:     RefreshCookiePath,
 		MaxAge:   maxAge,
 		Expires:  expiresAt,
 		HttpOnly: true,
 		Secure:   common.SessionCookieSecure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: common.SessionCookieSameSite,
 	})
 	writeSessionHintCookie(c, maxAge, expiresAt)
 }
@@ -347,12 +365,12 @@ func ClearRefreshCookie(c *gin.Context) {
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     RefreshCookieName,
 		Value:    "",
-		Path:     "/api/user/auth",
+		Path:     RefreshCookiePath,
 		MaxAge:   -1,
 		Expires:  time.Unix(1, 0),
 		HttpOnly: true,
 		Secure:   common.SessionCookieSecure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: common.SessionCookieSameSite,
 	})
 	clearSessionHintCookie(c)
 }
@@ -374,16 +392,24 @@ func ClearRefreshCookie(c *gin.Context) {
 // why it lives inside these two helpers rather than at their call sites: both
 // cookies then ride the same response with the same expiry, and no login path
 // can set one without the other.
+//
+// Its Path is deliberately wider than the Refresh Cookie's. The Refresh
+// Cookie is scoped to /api/user/auth because that is the only place it is
+// ever sent from, but the hint exists to be read by the frontend's own
+// scripts, which live on the frontend's origin. In a separated deployment
+// the frontend is on a different origin entirely, so this cookie is
+// unreadable there no matter how wide its Path is — the frontend mirrors the
+// hint into localStorage instead (see the frontend's session-hint module).
 func writeSessionHintCookie(c *gin.Context, maxAge int, expiresAt time.Time) {
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     SessionHintCookieName,
 		Value:    SessionHintCookieValue,
-		Path:     "/",
+		Path:     SessionHintCookiePath,
 		MaxAge:   maxAge,
 		Expires:  expiresAt,
 		HttpOnly: false,
 		Secure:   common.SessionCookieSecure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: common.SessionCookieSameSite,
 	})
 }
 
@@ -391,12 +417,12 @@ func clearSessionHintCookie(c *gin.Context) {
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     SessionHintCookieName,
 		Value:    "",
-		Path:     "/",
+		Path:     SessionHintCookiePath,
 		MaxAge:   -1,
 		Expires:  time.Unix(1, 0),
 		HttpOnly: false,
 		Secure:   common.SessionCookieSecure,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: common.SessionCookieSameSite,
 	})
 }
 

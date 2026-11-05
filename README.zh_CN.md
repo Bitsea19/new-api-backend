@@ -252,25 +252,42 @@ docker compose logs -f new-api
 
 后端使用 Go 和 Gin；控制台使用 React 19、TypeScript、Rsbuild、TanStack 与 Tailwind CSS 4。前端依赖和脚本使用 Bun；Go 语言基线见 [go.mod](./go.mod)，容器构建工具链见 [Dockerfile](./Dockerfile)。
 
-后端会嵌入 `web/dist`，首次启动前先构建前端：
+控制台是独立的项目，放在单独的仓库中，后端默认只编译为纯 API 服务，不携带前端产物。前后端分离部署时，两侧各自构建、各自部署，通过环境变量互相定位：
+
+| 变量 | 所属 | 含义 |
+| --- | --- | --- |
+| `FRONTEND_BASE_URL` | 后端 | 控制台（面板）的公开地址。浏览器访问后端根路径时 301 到该地址，OAuth 回跳、密码重置链接、支付回跳也用它 |
+| `API_BASE_URL` | 后端 | 后端 API 的公开地址。图片代理、视频内容、支付异步通知回调用它 |
+| `CORS_ALLOWED_ORIGINS` | 后端 | 允许携带 Cookie 跨域访问 API 的精确 origin 白名单，逗号分隔，不支持通配符 |
+| `VITE_API_BASE_URL` | 前端 | 后端的公开地址，留空表示同源。构建时固化进产物 |
+
+本地开发：先启动后端，再在前端仓库中启动开发服务器（会把 API 请求代理到 3000 端口）：
 
 ```bash
-# 仓库根目录
-cd web
-bun install --frozen-lockfile
-bun run build
-cd ..
+# 后端仓库根目录
 go run .
 ```
 
-在另一个终端启动前端开发服务器：
-
 ```bash
-cd web
+# 前端仓库根目录
+bun install
 bun run dev -- --port 5173
 ```
 
-访问 [http://localhost:5173](http://localhost:5173)，开发服务器会将 API 请求代理到 3000 端口的后端。需要容器化开发后端时，参阅 [docker-compose.dev.yml](./docker-compose.dev.yml) 和 [makefile](./makefile) 中的 `make dev`。
+访问 [http://localhost:5173](http://localhost:5173)。需要容器化开发后端时，参阅 [docker-compose.dev.yml](./docker-compose.dev.yml) 和 [makefile](./makefile) 中的 `make dev`。
+
+单体部署（前后端合成一个二进制）仍然可用，但需要前端构建产物：
+
+```bash
+# 前端仓库根目录
+bun install --frozen-lockfile
+bun run build
+```
+
+```bash
+# 后端仓库根目录，把产物放进 web/dist 后构建
+make build-embedded
+```
 
 | 目录 | 职责 |
 | --- | --- |
@@ -279,10 +296,9 @@ bun run dev -- --port 5173
 | `service/`、`model/` | 业务逻辑与持久化 |
 | [relaykit/](./relaykit/README.md) | 可独立构建的协议 DTO 与转换 Go 模块 |
 | [plugins/tasks/](./plugins/tasks/) | JavaScript 任务插件；编写方式与宿主边界见 [Task Plugin API v1](./docs/plugin-api/v1.md) |
-| `web/` | Web 控制台，参阅[前端开发约定](./web/AGENTS.md) |
 | [electron/](./electron/README.md) | 桌面封装与打包 |
 
-贡献前请阅读 [AGENTS.md](./AGENTS.md)。按改动范围执行检查：Go 模块使用 `make test`；前端在 `web/` 下运行 `bun check -b`、`bun run lint`、`bun run test` 和 `bun run build`。修改 RelayKit 后还必须在 `relaykit/` 下执行 `GOWORK=off go build ./...`。
+贡献前请阅读 [AGENTS.md](./AGENTS.md)。按改动范围执行检查：Go 模块使用 `make test`；前端在控制台仓库中运行 `bun check -b`、`bun run lint`、`bun run test` 和 `bun run build`。修改 RelayKit 后还必须在 `relaykit/` 下执行 `GOWORK=off go build ./...`。
 
 <a id="documentation"></a>
 

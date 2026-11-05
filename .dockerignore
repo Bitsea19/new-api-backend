@@ -7,6 +7,9 @@ Makefile
 docs
 .eslintcache
 .gocache
-/web/node_modules
-/web/dist
 !THIRD-PARTY-LICENSES.md
+
+# The dashboard lives in its own repository. The default build is a pure API
+# server and carries no frontend bundle, so nothing from the frontend is
+# needed to build the image.
+web/

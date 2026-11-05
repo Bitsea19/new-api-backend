@@ -180,6 +180,16 @@ func resolveOrigins(r *http.Request, settings *system_setting.PasskeySettings) (
 	}
 
 autoDetect:
+	// A WebAuthn ceremony runs in the browser, so the origin that matters is
+	// the one the browser is on — the frontend's. In a separated deployment
+	// the request arrives at the API's host, which is not the origin the
+	// browser will present, so the request host would be the wrong answer.
+	if frontendOrigin := strings.TrimSpace(common.FrontendBaseURL); frontendOrigin != "" {
+		if parsed, err := url.Parse(frontendOrigin); err == nil && parsed.Scheme != "" && parsed.Host != "" {
+			return []string{strings.TrimRight(frontendOrigin, "/")}, nil
+		}
+	}
+
 	scheme := detectScheme(r)
 	if scheme == "http" && !settings.AllowInsecureOrigin && r.Host != "localhost" && r.Host != "127.0.0.1" && !strings.HasPrefix(r.Host, "127.0.0.1:") && !strings.HasPrefix(r.Host, "localhost:") {
 		return nil, fmt.Errorf("passkey requires HTTPS, current request: %s://%s; allow insecure origins in the Passkey settings or configure HTTPS", scheme, r.Host)
