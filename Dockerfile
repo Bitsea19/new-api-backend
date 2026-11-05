@@ -23,7 +23,12 @@ ADD tokenkit/go.mod ./tokenkit/go.mod
 RUN go mod download
 
 COPY . .
-RUN go build -pgo="$(go list -m -f '{{.Dir}}' github.com/Calcium-Ion/moejs)/default.pgo" -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=$(cat VERSION)'" -o new-api
+# VERSION is written by CI. When building from a plain source checkout it is
+# empty, so fall back to a placeholder instead of stamping an empty version.
+ARG APP_VERSION=dev
+RUN BUILD_VERSION="$(cat VERSION 2>/dev/null || true)" \
+    && BUILD_VERSION="${BUILD_VERSION:-${APP_VERSION}}" \
+    && go build -pgo="$(go list -m -f '{{.Dir}}' github.com/Calcium-Ion/moejs)/default.pgo" -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=${BUILD_VERSION}'" -o new-api
 
 FROM debian:bookworm-slim@sha256:f06537653ac770703bc45b4b113475bd402f451e85223f0f2837acbf89ab020a
 
