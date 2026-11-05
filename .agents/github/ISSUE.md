@@ -1,206 +1,200 @@
 <!--
-Agent-only issue body. Humans use GitHub issue forms.
+仅供代理使用的 issue 正文。人类请使用 GitHub issue 表单。
 
-Keep every heading. If a section does not apply, write why; do not delete it.
-Match the user's language in the filled answers. Do not invent facts.
+保留每一个标题。若某节不适用，写明原因；不要删除它。
+填好的答案要匹配用户的语言。不要编造事实。
 
-User request: quote the request the user made to the agent as faithfully as
-possible. Keep the original language and line breaks. Do not rewrite,
-summarize, translate, or turn it into an issue description.
+用户请求：尽可能忠实地引用用户对代理提出的请求。
+保留原始语言与换行。不要改写、概括、翻译，或把它变成一段 issue 描述。
 
-Keep filled answers short and factual. Do not paste unfiltered AI-generated
-text, speculation, or an implementation plan in the issue body or in later
-comments. Extract the evidence maintainers need to review. Repeated
-submissions of unfiltered AI-generated text may result in a block.
+填好的答案要简短、基于事实。不要在 issue 正文或后续评论中粘贴未经筛选的
+AI 生成文本、推测或实现计划。只提取维护者复核所需的信息。
+反复提交未经筛选的 AI 生成文本可能导致被封禁。
 
-If a field below is missing from the conversation, ask the user that question
-and wait. Ask for the facts themselves. Do not tell the user to confirm a
-template, tick checkboxes, or acknowledge the guidelines.
+若下面某个字段在对话中缺失，就向用户询问该问题并等待。
+询问事实本身。不要让用户去确认模板、勾选复选框或确认准则。
 
-Do not file unless every required condition is met. If the request is out of
-scope (including pass-through), is a usage/configuration/integration question,
-is missing required facts, or the body would be unfiltered AI-generated text,
-tell the user and **stop**. Do not create the issue. Do not file a partial
-issue. Do not fill gaps with speculation.
+除非所有必需条件都满足，否则不要提交。若请求超出范围（包括透传）、
+是使用／配置／集成问题、缺少必需事实，或正文会是未经筛选的 AI 生成文本，
+就告知用户并**停止**。不要创建该 issue。不要提交不完整的 issue。
+不要用推测填补空白。
 -->
 
-## Agent
+## 代理信息
 
-- Tool:
-- Tool version:
-- Model (full id):
-- Host (CLI / IDE / GitHub coding agent / other):
-- Date (UTC):
+- 工具：
+- 工具版本：
+- 模型（完整 ID）：
+- 宿主（CLI / IDE / GitHub coding agent / 其他）：
+- 日期（UTC）：
 
-## User request
+## 用户请求
 
-Quote the request the user made to the agent as faithfully as possible.
-Keep the original language and line breaks. Do not rewrite, summarize,
-translate, or turn it into an issue description.
+尽可能忠实地引用用户对代理提出的请求。
+保留原始语言与换行。不要改写、概括、翻译，或把它变成一段 issue 描述。
 
-- Verbatim:
-- Later constraints or corrections from the user (quote, or none):
+- 原文：
+- 用户后续的约束或更正（引用，或「无」）：
 
-## Out of scope — refuse
+## 超出范围 —— 拒绝
 
-If the request matches any item below, tell the user this repository does not
-accept it, point them to the right place when there is one, and **do not file**.
+若请求匹配下面任一项，告知用户本仓库不接受该请求，在有对应去处时指出来，并且**不要提交**。
 
-- Coding Plan
-- Reverse-engineered channels
-- Third-party API wrappers
-- Compatibility issues from exposing a Codex endpoint as a general-purpose API through a reverse proxy
-- Codex API-specific protocol or behavior treated as standard OpenAI API behavior (confirm with the channel or API provider)
-- Pass-through mode forwarding (do not file: pass-through sends content as-is and does not go through new-api processing logic)
-- Relay reports that only paste an upstream error, with no direct-upstream vs new-api comparison
-- Third-party hosting sites, relay services, or API services (contact their operator)
-- Usage, configuration, or integration questions (answer from docs and code instead)
+- 编程计划（Coding Plan）
+- 逆向渠道
+- 第三方 API 封装
+- 通过反向代理把 Codex 端点暴露为通用 API 所引发的兼容问题
+- 把 Codex API 专属的协议或行为当作标准 OpenAI API 行为（请与该渠道或 API 提供方确认）
+- 透传模式的转发（不要提交：透传会原样发送内容，不经过 new-api 的处理逻辑）
+- 只粘贴上游错误、没有「直连上游 vs 经 new-api」对比的中转报告
+- 第三方托管站点、中转服务或 API 服务（请联系其运营方）
+- 使用、配置或集成问题（从文档与代码中回答，不要提交）
 
-- Matched: yes/no
-- If yes, what was told to the user (stop here; do not file):
+- 是否匹配：是／否
+- 如果是，告诉了用户什么（到此为止；不要提交）：
 
-## File gate — do not file unless all are satisfied
+## 提交门槛 —— 除非全部满足，否则不要提交
 
-If any item fails, tell the user and **stop**. Do not create the issue.
+若任何一项不满足，告知用户并**停止**。不要创建该 issue。
 
-- Out of scope (including pass-through): no
-- Usage / configuration / integration (answered instead of filing): no
-- Required facts present without invention (actual behavior, impact, frequency, evidence in new-api, applicable type fields): yes
-- Body is short and factual; no unfiltered AI-generated text: yes
-- File: yes/no
-- If no, what was told to the user (stop here):
+- 超出范围（包括透传）：否
+- 使用／配置／集成（改为回答而不提交）：否
+- 必需事实齐备且未编造（实际行为、影响、频率、问题出在 new-api 的证据、适用的类型字段）：是
+- 正文简短且基于事实；没有未经筛选的 AI 生成文本：是
+- 提交：是／否
+- 如果否，告诉了用户什么（到此为止）：
 
-## Kind
+## 类型
 
-- [ ] Bug
-- [ ] Feature
-- [ ] Investigation
-- [ ] Other:
+- [ ] 缺陷
+- [ ] 功能
+- [ ] 调查
+- [ ] 其他：
 
-## Usage / configuration / integration check
+## 使用／配置／集成排查
 
-Search these yourself before filing. Do not send the user to "read the docs first". If this is usage, configuration, or integration: answer the user and do not file.
+提交前请自行检索。不要把用户打发去「先看文档」。若这是使用、配置或集成问题：回答用户，不要提交。
 
-- https://docs.newapi.ai/ — what was searched, conclusion:
-- https://deepwiki.com/QuantumNous/new-api — what was searched, conclusion:
-- README / repo docs:
-- Relevant code paths and conclusion:
-- Can the current version already do this? (required for feature requests):
-- Verdict: product bug or new feature / usage question (stop here):
+- https://docs.newapi.ai/ —— 检索了什么，结论：
+- https://deepwiki.com/QuantumNous/new-api —— 检索了什么，结论：
+- README／仓库文档：
+- 相关代码路径与结论：
+- 当前版本是否已经能做到？（功能请求必填）：
+- 结论：产品缺陷 / 新功能 / 使用问题（到此为止）：
 
-## Environment
+## 环境
 
-- new-api version / commit / image tag (not `latest` / `unknown`):
-- Deploy source (repo release / official image / main source / other):
-- Database (sqlite / mysql / postgres):
+- new-api 版本／commit／镜像标签（不要用 `latest`／`unknown`）：
+- 部署来源（仓库发布版／官方镜像／main 源码／其他）：
+- 数据库（sqlite / mysql / postgres）：
 
-## Problem facts
+## 问题事实
 
-Ask the user for every item and write it down. Facts only; do not paste unfiltered AI-generated text:
+向用户询问每一项并如实记录。只写事实；不要粘贴未经筛选的 AI 生成文本：
 
-- Actual behavior:
-- Impact:
-- Frequency:
-- Evidence that the problem is in new-api rather than the client or upstream:
+- 实际行为：
+- 影响：
+- 频率：
+- 证明问题出在 new-api 而非客户端或上游的证据：
 
-## Type-specific details
+## 分类专属细节
 
-Fill every applicable type. Write "not applicable" for the rest. Ask the user for missing items; do not invent them.
+填写每一项适用的内容，其余写「不适用」。缺失的项要询问用户；不要编造。
 
-### Relay / API
+### 中转／API
 
-- Request endpoint and method:
-- Channel type:
-- Model:
-- Conversion format:
-- Pass-through enabled:
-- Evidence of upstream native support:
-- Equivalent redacted request sent directly upstream: status, body, server logs:
-- Same request through new-api: status, body, server logs:
+- 请求端点与方法：
+- 渠道类型：
+- 模型：
+- 转换格式：
+- 是否开启透传：
+- 上游原生支持的证据：
+- 直接发往上游的等价脱敏请求：状态码、请求体、服务端日志：
+- 同一请求经 new-api：状态码、请求体、服务端日志：
 
-### Billing
+### 计费
 
-- Request endpoint and model:
-- Response `usage`:
-- Relevant ratio or pricing configuration:
-- Consumption log:
-- Expected charge and calculation basis:
+- 请求端点与模型：
+- 响应中的 `usage`：
+- 相关倍率或定价配置：
+- 消费日志：
+- 期望扣费与计算依据：
 
-### Frontend
+### 前端
 
-- Page path:
-- Browser and version:
-- Active theme:
-- Relevant browser Console / Network errors:
+- 页面路径：
+- 浏览器与版本：
+- 生效主题：
+- 相关的浏览器控制台／网络错误：
 
-### Deployment / upgrade
+### 部署／升级
 
-- Deployment method:
-- OS and architecture:
-- Database type:
-- Versions before and after the upgrade:
-- Startup or migration logs:
+- 部署方式：
+- 操作系统与架构：
+- 数据库类型：
+- 升级前后的版本：
+- 启动或迁移日志：
 
-## Reproduction and expected result
+## 复现步骤与预期结果
 
-- Steps to reproduce:
-- Expected result:
-- Related screenshots (optional):
+- 复现步骤：
+- 预期结果：
+- 相关截图（可选）：
 
-## Feature (feature requests only)
+## 功能（仅功能请求）
 
-- Feature description:
-- Use case:
+- 功能描述：
+- 使用场景：
 
-## Duplicate check
+## 重复性排查
 
-- Search queries (issues, PRs, discussions):
-- Closest existing threads:
-- Why this is not a duplicate:
+- 检索词（issues、PRs、讨论）：
+- 最接近的已有讨论：
+- 为什么这不是重复：
 
-## Research
+## 调研
 
-Open the docs and code. Do not write "already checked" without sources.
-Do not replace the fields below with unfiltered AI-generated text.
+打开文档与代码。不要在没有来源的情况下写「已经查过」。
+不要用未经筛选的 AI 生成文本替换下面的字段。
 
-### Docs
+### 文档
 
-- https://docs.newapi.ai/ :
-- https://deepwiki.com/QuantumNous/new-api :
-- README / other repo docs:
-- Conclusions:
+- https://docs.newapi.ai/ ：
+- https://deepwiki.com/QuantumNous/new-api ：
+- README／其他仓库文档：
+- 结论：
 
-### Code
+### 代码
 
-- Path — what it does, and how it relates:
+- 路径 —— 它做什么，以及与问题的关系：
 
-### Experiments
+### 实验
 
-- Command or redacted request:
-- Direct upstream result:
-- Result through new-api:
-- Conclusion:
+- 命令或脱敏请求：
+- 直连上游的结果：
+- 经 new-api 的结果：
+- 结论：
 
-## Working theory
+## 工作假设
 
-- What is broken or missing:
-- Why:
-- What would falsify this:
+- 有什么是坏的或缺失的：
+- 为什么：
+- 什么情况会推翻它：
 
-## Scope
+## 范围
 
-- In scope for a later PR:
-- Out of scope / not this repo:
-- Large or directional feature? If yes, this issue is for maintainer alignment; do not open a PR yet.
+- 后续 PR 的范围内：
+- 超出范围／不属本仓库：
+- 是大型或方向性功能吗？如果是，这个 issue 用于与维护者对齐；此时先不要开 PR。
 
-## Proposed direction
+## 建议方向
 
-(acceptance criteria, not an implementation dump)
+（验收标准，而不是实现方案）
 
-## Not verified
+## 未验证
 
-(platforms, databases, providers, versions, paths not checked)
+（未检查的平台、数据库、供应商、版本、路径）
 
-## Related
+## 相关
 
-- Issues / PRs / upstream docs:
+- Issues／PRs／上游文档：

@@ -1,79 +1,83 @@
 ---
 name: i18n-translate
 description: >-
-  Complete and maintain frontend i18n translations for this project. Covers
-  finding missing translation keys, detecting untranslated entries, and adding
-  translations for all supported locales (en, zh, zh-TW, fr, ja, ru, vi). Use for any
-  task involving frontend locale files, missing translation keys, untranslated
-  UI text, `t(...)` keys, `useTranslation()`, static i18n keys, button/label/
-  toast/dialog/placeholder/validation copy, or adding/fixing even a single
-  i18n key. Use when review findings mention missing i18n, when new UI text
-  needs translation, or when the user asks to add translations, fix i18n, or
-  complete missing translations. Always load and follow this skill before
-  translating, adding locale keys, or editing frontend i18n files.
+  为本项目补全并维护前端 i18n 翻译。涵盖查找缺失的翻译键、
+  检测未翻译条目，以及为所有受支持的语言环境（en、zh、zh-TW、fr、ja、ru、vi）
+  添加翻译。凡涉及前端语言文件、缺失翻译键、未翻译的 UI 文本、
+  `t(...)` 键、`useTranslation()`、静态 i18n 键、按钮／标签／
+  toast／对话框／占位符／校验文案，或添加／修正哪怕只有一个
+  i18n 键的任务，都应使用本技能。当审查结论提到缺少 i18n、当新的 UI 文本
+  需要翻译，或当用户要求添加翻译、修复 i18n 或补全缺失翻译时，使用本技能。
+  在翻译、添加语言键或编辑前端 i18n 文件之前，务必先加载并遵循本技能。
 ---
 
-# Frontend i18n Translation Workflow
+# 前端 i18n 翻译工作流
 
-## Mandatory Preflight
+## 强制前置检查
 
-- Read this entire `SKILL.md` before any frontend i18n work, including one-key fixes.
-- Before editing locale files, confirm the source text comes from a `t(...)` key, `en.json`, existing UI copy, or an explicitly requested new UI string.
-- Use the user conversation only to understand the task target. Do not copy conversation text, review wording, or task descriptions directly into locale values.
-- Before translating each key, re-think the intended UI copy from the code and locale context instead of treating the surrounding chat as the translation source.
+- 在任何前端 i18n 工作之前通读整个 `SKILL.md`，包括只修一个键的情况。
+- 编辑语言文件之前，确认源文本来自 `t(...)` 键、`en.json`、既有 UI 文案，或用户明确要求的新 UI 字符串。
+- 只用用户对话来理解任务目标。不要把对话文本、审查措辞或任务描述直接写进语言文件。
+- 翻译每个键之前，从代码与语言环境上下文重新思考它的界面含义，而不是把周围的对话当作翻译来源。
 
-### Hard Constraint: Locale Writes Go Through the Script
+### 硬性约束：语言文件写入必须走脚本
 
-- You MUST NOT edit `web/src/i18n/locales/*.json` directly with text-editing tools (StrReplace, Write, search-and-replace, manual JSON edits, etc.). This applies even to a single key.
-- ALL locale writes MUST go through the `add-missing-keys.mjs` script, followed by `bun run i18n:sync`. The script is the only sanctioned way to add or change locale values.
-- Why this is mandatory, not optional:
-  - Hand-editing reliably drops one or more of the seven locales (`en`, `zh`, `zh-TW`, `fr`, `ja`, `ru`, `vi`), leaving keys missing in some languages.
-  - Hand-editing breaks the required alphabetical key order and introduces JSON syntax errors (trailing commas, mismatched quotes).
-  - The script writes all seven files atomically with consistent sorting, so the locale set stays in sync by construction.
-- The script does not do the translation for you. You still must reason out each locale's copy and populate the script's `newKeys` object; the script only handles insertion, sorting, and writing. Do not skip the script just because the thinking happens regardless.
+- 你绝不能直接用文本编辑工具（StrReplace、Write、查找替换、手工改 JSON 等）编辑
+  `new-api-web/src/i18n/locales/*.json`。即使只改一个键也不行。
+- 所有语言文件写入都必须经过 `add-missing-keys.mjs` 脚本，随后运行 `bun run i18n:sync`。
+  该脚本是添加或修改语言文件取值的唯一被认可的方式。
+- 为什么这是强制的，而非可选的：
+  - 手工编辑很容易漏掉七个语言环境（`en`、`zh`、`zh-TW`、`fr`、`ja`、`ru`、`vi`）中的一个或多个，
+    导致某些语言缺少键。
+  - 手工编辑会破坏要求的键字母序，还会引入 JSON 语法错误（尾随逗号、引号不匹配）。
+  - 脚本会原子地写入全部七个文件并保持一致的排序，语言集合因此在结构上始终同步。
+- 脚本不会替你做翻译。你仍然必须为每个语言环境推理出文案并填写脚本的 `newKeys` 对象；
+  脚本只负责插入、排序与写入。不要因为「反正思考过程是一样的」就跳过脚本。
 
-## Scope Checklist
+## 适用范围清单
 
-Before editing files, treat the task as covered by this skill if it involves:
+编辑文件之前，只要任务涉及以下内容，就按本技能处理：
 
-- `i18n`, translation, locale files, language packs, missing keys, or untranslated text
-- `t('...')`, `useTranslation()`, `static-keys.ts`, or `locales/*.json`
-- UI copy in buttons, labels, toasts, dialogs, placeholders, validation messages, descriptions, or table/empty states
-- A review finding about missing i18n keys
+- `i18n`、翻译、语言文件、语言包、缺失键或未翻译文本
+- `t('...')`、`useTranslation()`、`static-keys.ts` 或 `locales/*.json`
+- 按钮、标签、toast、对话框、占位符、校验信息、描述或表格／空状态中的 UI 文案
+- 关于缺少 i18n 键的审查结论
 
-Do not skip this workflow because the fix is "just one key".
+不要因为「只是修一个键」就跳过这个工作流。
 
-## Overview
+## 概览
 
-- Locale files: `web/src/i18n/locales/{en,zh,zh-TW,fr,ja,ru,vi}.json`
-- Format: flat JSON under `"translation"` key, keys are English source strings
-- Base locale: `en.json` (most keys), fallback: `zh` (Chinese)
-- Sync script: `bun run i18n:sync` (from `web/`)
-- All `t()` calls must have corresponding keys in every locale file
+- 语言文件：`new-api-web/src/i18n/locales/{en,zh,zh-TW,fr,ja,ru,vi}.json`
+- 格式：`"translation"` 键下的扁平 JSON，键为英文源文本
+- 基准语言：`en.json`（键最多），回退：`zh`（中文）
+- 同步脚本：`bun run i18n:sync`（在 `new-api-web/` 下执行）
+- 所有 `t()` 调用都必须在每个语言文件中有对应的键
 
-## Small Fix Path
+## 小修复路径
 
-For a single known missing key (still script-only, no direct JSON edits):
+针对单个已知缺失的键（仍然只能走脚本，不能直接改 JSON）：
 
-1. Confirm the exact key at the call site and verify it is absent from all locale files.
-2. Add the key via `add-missing-keys.mjs`, populating its `newKeys` object for every supported locale: `en`, `zh`, `zh-TW`, `fr`, `ja`, `ru`, `vi`. Even one key goes through the script; do not hand-edit the JSON.
-3. The script preserves the flat `"translation"` object and keeps keys alphabetically sorted automatically.
-4. Run a targeted search for the key in code and locale files.
-5. Run `bun run i18n:sync` to normalize file order. This step is mandatory, not optional.
+1. 在调用处确认确切的键，并验证它在所有语言文件中都不存在。
+2. 通过 `add-missing-keys.mjs` 添加该键，为每个受支持的语言环境填写其 `newKeys` 对象：
+   `en`、`zh`、`zh-TW`、`fr`、`ja`、`ru`、`vi`。即使只有一个键也要走脚本；不要手工改 JSON。
+3. 脚本会保留扁平的 `"translation"` 对象，并自动保持键按字母序排列。
+4. 针对该键在代码与语言文件中做一次定向检索。
+5. 运行 `bun run i18n:sync` 归一化文件顺序。这一步是强制的，不是可选的。
 
-## Workflow
+## 工作流程
 
-### Step 1: Run sync and read report
+### 第 1 步：运行同步并阅读报告
 
 ```bash
-cd web && bun run i18n:sync
+cd new-api-web && bun run i18n:sync
 ```
 
-Read `web/src/i18n/locales/_reports/_sync-report.json` to see per-locale status (missingCount, extrasCount, untranslatedCount).
+阅读 `new-api-web/src/i18n/locales/_reports/_sync-report.json` 查看各语言环境的状态
+（missingCount、extrasCount、untranslatedCount）。
 
-### Step 2: Find missing keys (used in code but not in locale files)
+### 第 2 步：查找缺失键（代码中使用了但语言文件中没有）
 
-Create and run `web/scripts/find-missing-keys.mjs`:
+创建并运行 `new-api-web/scripts/find-missing-keys.mjs`：
 
 ```javascript
 import fs from 'node:fs/promises'
@@ -134,9 +138,9 @@ if (missingKeys.size === 0) {
 }
 ```
 
-### Step 3: Find untranslated entries (value equals English)
+### 第 3 步：查找未翻译条目（取值与英文相同）
 
-Create and run `web/scripts/find-untranslated.mjs`:
+创建并运行 `new-api-web/scripts/find-untranslated.mjs`：
 
 ```javascript
 import fs from 'node:fs/promises'
@@ -146,7 +150,7 @@ const LOCALES_DIR = path.resolve('src/i18n/locales')
 const en = JSON.parse(await fs.readFile(path.join(LOCALES_DIR, 'en.json'), 'utf8'))
 const enTrans = en.translation
 
-// Brand names, URLs, technical terms — skip these
+// 品牌名、URL、技术术语 —— 跳过这些
 const skipPatterns = [
   /^https?:\/\//, /^smtp\./, /^socks5:/, /^name@/, /^noreply@/,
   /^org-/, /^price_/, /^whsec_/, /^edit_this$/, /^my-status$/,
@@ -194,9 +198,10 @@ for (const locale of locales) {
 }
 ```
 
-### Step 4: Add translations
+### 第 4 步：添加翻译
 
-This script is the ONLY sanctioned way to write locale values. You MUST NOT bypass it by hand-filling the JSON files. Create `web/scripts/add-missing-keys.mjs` with this exact structure:
+该脚本是写入语言文件取值的唯一被认可方式。你绝不能通过手工填写 JSON 文件绕过它。
+创建 `new-api-web/scripts/add-missing-keys.mjs`，结构如下：
 
 ```javascript
 import fs from 'node:fs/promises'
@@ -253,62 +258,65 @@ async function main() {
 main().catch((err) => { console.error(err); process.exitCode = 1 })
 ```
 
-Populate the `newKeys` object with actual translations for each locale.
+为每个语言环境在 `newKeys` 对象中填入实际翻译。
 
-### Step 5: Verify and clean up
+### 第 5 步：验证与清理
 
 ```bash
-cd web
-node scripts/add-missing-keys.mjs   # apply translations
-node scripts/find-missing-keys.mjs  # verify: should say "All t() keys found"
-bun run i18n:sync                   # normalize file order
+cd new-api-web
+node scripts/add-missing-keys.mjs   # 应用翻译
+node scripts/find-missing-keys.mjs  # 验证：应提示 "All t() keys found"
+bun run i18n:sync                   # 归一化文件顺序
 ```
 
-Delete temporary scripts after completion.
+完成后删除临时脚本。
 
-## Translation Guidelines
+## 翻译指南
 
-### Source Text Rules
+### 源文本规则
 
-- Reconsider every key's UI meaning before translating: component location, user action, placeholder variables, button/label/toast/dialog/validation context, and whether the copy is a noun, command, status, or full sentence.
-- Prefer the English key or `en` value as the source text. Use the call site only to clarify meaning, tone, and constraints.
-- Do not copy chat messages, review comments, issue descriptions, or task wording as translation text.
-- If the source text is unclear, inspect the code and locale files first. Ask the user for exact source copy only when the intended UI text remains ambiguous.
+- 翻译每个键之前重新审视它的界面含义：组件位置、用户动作、占位变量、按钮／标签／toast／对话框／校验上下文，
+  以及这段文案是名词、命令、状态还是完整句子。
+- 优先以英文键或 `en` 取值为源文本。只用调用处来澄清含义、语气与约束。
+- 不要把聊天消息、审查评论、issue 描述或任务措辞当作翻译文本。
+- 如果源文本含义不清，先检查代码与语言文件。只有当预期的界面文本仍有歧义时，才向用户询问确切文案。
 
-### Length and Layout Awareness
+### 长度与布局意识
 
-- Consider whether translated text may overflow the UI before choosing final wording, especially for buttons, table headers, menu items, labels, toasts, dialog titles, tabs, badges, and empty states.
-- For languages that often expand relative to English, especially French, Russian, and Vietnamese, prefer natural but compact wording.
-- Do not sacrifice meaning just to shorten text. When the call site has limited space, choose the shortest clear translation that preserves the UI intent.
-- For interpolated variables, counts, model names, provider names, quotas, and dates, consider the longest realistic rendered text, not only the translation string itself.
+- 在确定最终措辞前，考虑翻译后的文本是否可能溢出界面，尤其是按钮、表头、菜单项、标签、toast、
+  对话框标题、标签页、徽章与空状态。
+- 对相对英文常常更长的语言，尤其是法语、俄语与越南语，优先选择自然但紧凑的措辞。
+- 不要为了缩短文本而牺牲含义。当调用处空间有限时，选择保留界面意图的最短清晰译法。
+- 对带插值的变量、数量、模型名、供应商名、额度与日期，要考虑最长的实际渲染文本，而不只是译文字符串本身。
 
-| Language | Code | Notes |
+| 语言 | 代码 | 备注 |
 |----------|------|-------|
-| English | en | Base locale, key = value |
-| Chinese | zh | Fallback locale, must be complete |
-| Traditional Chinese | zh-TW | Use natural Traditional Chinese wording |
-| French | fr | Many English cognates are valid (e.g., "Configuration") |
-| Japanese | ja | Use katakana for technical loanwords |
-| Russian | ru | Use formal register |
-| Vietnamese | vi | Use standard Vietnamese |
+| 英语 | en | 基准语言，键 = 值 |
+| 简体中文 | zh | 回退语言，必须完整 |
+| 繁体中文 | zh-TW | 使用自然的繁体中文措辞 |
+| 法语 | fr | 很多英语同源词可以直接用（例如 "Configuration"） |
+| 日语 | ja | 技术外来词使用片假名 |
+| 俄语 | ru | 使用正式语体 |
+| 越南语 | vi | 使用标准越南语 |
 
-**Keep as English (do not translate):**
-- Brand/product names (OpenAI, Claude, Gemini, etc.)
-- URLs and email placeholders
-- Technical identifiers (JSON keys, API paths, model names)
-- Code-like strings (gpt-3.5-turbo, price_xxx, etc.)
+**保持英文（不翻译）：**
+- 品牌／产品名（OpenAI、Claude、Gemini 等）
+- URL 与邮箱占位符
+- 技术标识符（JSON 键、API 路径、模型名）
+- 形似代码的字符串（gpt-3.5-turbo、price_xxx 等）
 
-**Always translate:**
-- UI labels, button text, error messages, descriptions
-- Time units (hours, minutes, months, years)
-- Action words (Move, Show, Delete, etc.)
+**始终要翻译：**
+- UI 标签、按钮文案、错误信息、描述
+- 时间单位（小时、分钟、月、年）
+- 动作词（移动、显示、删除等）
 
-## Key Rules
+## 键的规则
 
-1. All scripts run from `web/` directory
-2. Use `node scripts/xxx.mjs` (ESM format with top-level await)
-3. Sort keys alphabetically when writing locale files
-4. Always run `bun run i18n:sync` as the final step
-5. Delete temporary scripts after completion
-6. The `{{variable}}` placeholders in keys must be preserved in all translations
-7. NEVER edit `locales/*.json` directly. Any non-script write to a locale file (StrReplace, Write, manual JSON edit) is non-compliant, including single-key fixes.
+1. 所有脚本都在 `new-api-web/` 目录下运行
+2. 使用 `node scripts/xxx.mjs`（ESM 格式，支持顶层 await）
+3. 写入语言文件时按字母序排序键
+4. 始终以 `bun run i18n:sync` 作为最后一步
+5. 完成后删除临时脚本
+6. 键中的 `{{variable}}` 占位符必须在所有翻译中保留
+7. 绝不要直接编辑 `locales/*.json`。对语言文件的任何非脚本写入（StrReplace、Write、手工改 JSON）都不合规，
+   包括只修一个键的情况。

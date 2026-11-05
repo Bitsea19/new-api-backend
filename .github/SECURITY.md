@@ -1,96 +1,94 @@
-# Security Policy
+# 安全政策
 
 > [!IMPORTANT]
-> **Bulk Reporting Policy:** If you need to submit multiple vulnerability reports in bulk, **you must contact us first** ([support@quantumnous.com](mailto:support@quantumnous.com)) to coordinate the submission process. Uncoordinated bulk submissions have caused significant disruption to our team, and we will take the following actions:
+> **批量报告政策：** 如果你需要批量提交多个漏洞报告，**必须先联系我们**（[support@quantumnous.com](mailto:support@quantumnous.com)）以协调提交流程。未协调的批量提交已对我们的团队造成严重干扰，我们将采取以下措施：
 >
-> 1. **All uncoordinated bulk reports will be closed without review.**
-> 2. **Repeated offenders may be blocked** from further submissions.
+> 1. **所有未协调的批量报告都会被关闭且不予审查。**
+> 2. **屡次违规者可能被封禁**，不再接受其后续提交。
 >
-> We welcome thorough security research, but please reach out before submitting multiple reports.
+> 我们欢迎详尽的安全研究，但请在提交多个报告前先与我们联系。
 
-## Supported Versions
+## 支持的版本
 
-We provide security updates for the following versions:
+我们为以下版本提供安全更新：
 
+| 版本     | 是否支持   |
+| -------- | ---------- |
+| 最新版本 | :white_check_mark: |
+| 更旧版本 | :x:         |
 
-| Version | Supported          |
-| ------- | ------------------ |
-| Latest  | :white_check_mark: |
-| Older   | :x:                |
+我们强烈建议用户始终使用最新版本，以获得最好的安全性与功能。
 
+## 报告漏洞
 
-We strongly recommend that users always use the latest version for the best security and features.
+我们非常重视安全漏洞报告。如果你发现安全问题，请按以下步骤进行负责任的披露。
 
-## Reporting a Vulnerability
+### 如何报告
 
-We take security vulnerability reports very seriously. If you discover a security issue, please follow the steps below for responsible disclosure.
+**不要**在公开的 GitHub Issue 中报告安全漏洞。
 
-### How to Report
+请使用 GitHub Security Advisories 标签页"[开启一个私密安全公告](https://github.com/QuantumNous/new-api/security/advisories/new)"来报告安全问题。这是首选方式，它提供了内建的私密沟通渠道。
 
-**Do NOT** report security vulnerabilities in public GitHub Issues.
+也可以通过邮件报告：
 
-To report a security issue, please use the GitHub Security Advisories tab to "[Open a draft security advisory](https://github.com/QuantumNous/new-api/security/advisories/new)". This is the preferred method as it provides a built-in private communication channel.
+- **邮箱**：[support@quantumnous.com](mailto:support@quantumnous.com)
+- **主题**：`[SECURITY] Security Vulnerability Report`
 
-Alternatively, you can report via email:
+### 需要包含的信息
 
-- **Email:** [support@quantumnous.com](mailto:support@quantumnous.com)
-- **Subject:** `[SECURITY] Security Vulnerability Report`
+为了帮助我们更快地理解并解决问题，请在报告中包含以下内容：
 
-### What to Include
+1. **漏洞类型** —— 简要描述漏洞（例如 SQL 注入、XSS、鉴权绕过等）
+2. **受影响组件** —— 受影响的文件路径、接口或功能模块
+3. **复现步骤** —— 详细的复现步骤
+4. **影响评估** —— 潜在的安全影响与严重程度评估
+5. **概念验证** —— 如可能，请提供概念验证代码或截图（不要在生产环境中测试）
+6. **修复建议** —— 如果你有修复方案，请一并提供
+7. **你的联系方式** —— 以便我们与你沟通
 
-To help us understand and resolve the issue more quickly, please include the following information in your report:
+## 响应流程
 
-1. **Vulnerability Type** - Brief description of the vulnerability (e.g., SQL injection, XSS, authentication bypass, etc.)
-2. **Affected Component** - Affected file paths, endpoints, or functional modules
-3. **Reproduction Steps** - Detailed steps to reproduce
-4. **Impact Assessment** - Potential security impact and severity assessment
-5. **Proof of Concept** - If possible, provide proof of concept code or screenshots (do not test in production environments)
-6. **Suggested Fix** - If you have a fix suggestion, please provide it
-7. **Your Contact Information** - So we can communicate with you
+1. **确认收到**：我们会在 **48 小时**内确认收到你的报告。
+2. **初步评估**：我们会在 **7 天**内完成初步评估并与你沟通。
+3. **修复开发**：根据漏洞的严重程度，我们会优先安排修复开发。
+4. **安全公告**：修复发布后，我们会发布安全公告（如适用）。
+5. **署名**：如果你愿意，我们会在安全公告中署你的贡献。
 
-## Response Process
+## 安全最佳实践
 
-1. **Acknowledgment:** We will acknowledge receipt of your report within **48 hours**.
-2. **Initial Assessment:** We will complete an initial assessment and communicate with you within **7 days**.
-3. **Fix Development:** Based on the severity of the vulnerability, we will prioritize developing a fix.
-4. **Security Advisory:** After the fix is released, we will publish a security advisory (if applicable).
-5. **Credit:** If you wish, we will credit your contribution in the security advisory.
+部署和使用 New API 时，我们建议遵循以下安全最佳实践：
 
-## Security Best Practices
+### 部署安全
 
-When deploying and using New API, we recommend following these security best practices:
+- **使用 HTTPS**：始终通过 HTTPS 提供服务，确保传输层安全
+- **防火墙配置**：只开放必要的端口，并限制对管理界面的访问
+- **及时更新**：及时升级到最新版本以获取安全补丁
+- **环境隔离**：生产环境使用独立的数据库与 Redis 实例
 
-### Deployment Security
+### API Key 安全
 
-- **Use HTTPS:** Always serve over HTTPS to ensure transport layer security
-- **Firewall Configuration:** Only open necessary ports and restrict access to management interfaces
-- **Regular Updates:** Update to the latest version promptly to receive security patches
-- **Environment Isolation:** Use separate database and Redis instances in production
+- **密钥保护**：不要在客户端代码或公开仓库中暴露 API Key
+- **最小权限**：为不同用途创建不同的 API Key，遵循最小权限原则
+- **定期轮换**：定期轮换 API Key
+- **监控用量**：监控 API Key 的使用情况，及时发现异常
 
-### API Key Security
+### 数据库安全
 
-- **Key Protection:** Do not expose API keys in client-side code or public repositories
-- **Least Privilege:** Create different API keys for different purposes, following the principle of least privilege
-- **Regular Rotation:** Rotate API keys regularly
-- **Monitor Usage:** Monitor API key usage and detect anomalies promptly
+- **强密码**：使用强密码保护数据库访问
+- **网络隔离**：数据库不应直接暴露在公网上
+- **定期备份**：定期备份数据库并验证备份完整性
+- **访问控制**：限制数据库用户权限，遵循最小权限原则
 
-### Database Security
+## 安全相关配置
 
-- **Strong Passwords:** Use strong passwords to protect database access
-- **Network Isolation:** Database should not be directly exposed to the public internet
-- **Regular Backups:** Regularly backup the database and verify backup integrity
-- **Access Control:** Limit database user permissions, following the principle of least privilege
+请确保以下安全相关环境变量与设置已正确配置：
 
-## Security-Related Configuration
+- `SESSION_SECRET` —— 使用强随机字符串
+- `SQL_DSN` —— 确保数据库连接使用安全配置
+- `REDIS_CONN_STRING` —— 如果使用 Redis，确保连接安全
 
-Please ensure the following security-related environment variables and settings are properly configured:
+详细配置说明请参阅项目文档。
 
-- `SESSION_SECRET` - Use a strong random string
-- `SQL_DSN` - Ensure database connection uses secure configuration
-- `REDIS_CONN_STRING` - If using Redis, ensure secure connection
+## 免责声明
 
-For detailed configuration instructions, please refer to the project documentation.
-
-## Disclaimer
-
-This project is provided "as is" without any express or implied warranty. Users should assess the security risks of using this software in their environment.
+本项目按"现状"提供，不带任何明示或默示的担保。使用者应自行评估在其环境中使用本软件的安全风险。

@@ -6,6 +6,26 @@ Copyright (c) QuantumNous and contributors.
 This project is licensed under the GNU Affero General Public License v3.0.
 See LICENSE for the full project license terms.
 
+==== Modification Notice (Frontend/Backend Separation Fork) ====
+
+This repository is a modified version of new-api. The modifications consist of
+separating the web console into a standalone repository and building the backend
+as a pure API server by default:
+
+  - The React frontend source has been moved out of this repository into a
+    separate frontend project (new-api-web).
+  - The backend builds as a pure API binary by default (build tag
+    !embed_frontend) and serves no static files.
+    The monolith remains available through the embed_frontend build tag.
+  - New deployment environment variables were added to support separated
+    deployments: FRONTEND_BASE_URL, API_BASE_URL, CORS_ALLOWED_ORIGINS,
+    SESSION_COOKIE_SECURE and SESSION_COOKIE_TRUSTED_URL.
+  - The Docker Compose configuration builds the image from the local source
+    tree instead of pulling the upstream published image.
+
+The modified version must not misrepresent the origin of the software and must
+mark its changes in accordance with AGPLv3 Section 7(c).
+
 ==== Additional Terms under AGPLv3 Section 7 ====
 
 Pursuant to Section 7(b) of the GNU Affero General Public License version 3,

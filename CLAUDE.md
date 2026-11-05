@@ -1,16 +1,16 @@
-# CLAUDE.md — Project Conventions for new-api
+# CLAUDE.md — new-api 后端项目开发规范
 
-## MANDATORY: Read AGENTS.md with the Read tool
+## 强制：先用 Read 工具读取 AGENTS.md
 
-Do not treat `@AGENTS.md` as loaded. Claude Code does not reliably inline that import.
+不要把 `@AGENTS.md` 当作已加载。Claude Code 并不总能可靠地内联该 import。
 
-Before any planning, coding, reviewing, or answering a project question, you MUST call the Read tool on the repo-root file `AGENTS.md` and wait for the full contents. This is the first action of every session and every new task.
+在开始任何规划、编码、审查或回答项目问题之前，你必须用 Read 工具读取仓库根目录的 `AGENTS.md` 并等待完整内容。这是每个会话和每个新任务的第一步。
 
-Rules:
+规则：
 
-- Do not start from memory, summaries, or this file alone.
-- Do not skip the Read because a previous turn mentioned AGENTS.md.
-- Do not replace the Read with a grep, glob, or partial skim.
-- After reading, follow every rule in `AGENTS.md` for the rest of the work.
-- If the task touches the frontend, also Read that repository's `AGENTS.md` before editing frontend files. The frontend lives in its own repository; `web/` here only holds the monolith's build output.
-- If the task touches billing as defined under **Billing rules (mandatory read gate)** in `AGENTS.md`, also Read `.agents/rules/billing.md` in full before planning or editing. Tasks outside that definition may skip it.
+- 不要从记忆、摘要或仅凭本文件开始。
+- 不要因为之前的回合提到过 AGENTS.md 就跳过这次 Read。
+- 不要用 grep、glob 或局部略读替代这次 Read。
+- 读取之后，本次工作的其余部分都要遵循 `AGENTS.md` 中的每一条规则。
+- 如果任务涉及前端，还要在编辑前端文件之前读取前端仓库的 `AGENTS.md`。前端位于独立仓库；此处的 `web/` 只保存单体构建的输出产物。
+- 如果任务触及 `AGENTS.md` 中 **计费规则（强制阅读门禁）** 一节定义的计费内容，还要在规划或编辑前完整读取 `.agents/rules/billing.md`。不属于该定义的任务可以跳过。
