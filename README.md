@@ -62,11 +62,17 @@ New API 是面向应用、Agent 和团队的自托管 AI 网关。将不同厂�
 
 后端默认编译为纯 API 服务，由 `web_assets_stub.go`（构建标签 `!embed_frontend`）提供空实现。构建不再依赖 `web/dist` 是否存在，Docker 镜像体积也小得多。
 
+后端仓库**不再保留 `web/` 目录** —— 前端代码完全在独立仓库，二开仓库里一行前端源码都没有。
+
 **单体部署仍然保留**：用 `embed_frontend` 标签构建即可把前端嵌入回二进制。
 
 ```bash
 make build-embedded    # 构建 ../new-api-web 并把产物放进 web/dist 后编译
 ```
+
+> `make build-embedded` 会在构建时自动创建 `web/dist`（构建产物，不纳入版本管理）。
+> 如果只跑 `go build -tags embed_frontend` 而没有前端产物，embed 指令会因找不到
+> `web/dist` 而报错 —— 这是预期行为。
 
 ### 2. 后端新增的分离部署能力
 
@@ -257,35 +263,45 @@ bun run dev
 ### 为什么要用同步脚本
 
 上游 `main` 分支**仍然带着完整的 `web/` 目录**，而本仓库早已把前端剥离到独立仓库，
-只保留 `web/.gitignore` 作为「前端产物落点」的占位说明。
+连 `web/` 目录本身都不保留。
 
 直接 `git merge upstream/main` 的实测结果：
 
 - 后端代码（`model/`、`relay/`、`middleware/` 等）**零冲突**，正常合入
 - 冲突 100% 集中在 `web/`，形式为 modify/delete（上游改了 web/ 里的文件，
-  而本仓库删除了整个 web/ 源码）
+  而本仓库删除了整个 web/ 目录）
 
 也就是说，**直接 merge 不会破坏后端二开**，但会把上游的前端源码拖回来，造成
-大量假冲突和目录污染。`scripts/sync-upstream.ps1` 就是为了消掉这一步：
-它做标准三方合并，然后自动把 `web/` 恢复成二开形态。
+大量假冲突和目录污染。同步脚本就是为了消掉这一步：它做标准三方合并，
+然后自动移除上游带来的 `web/`。
+
+### 同步脚本放在本地，不随仓库分发
+
+同步脚本是**本地维护工具**，不纳入版本管理，因此不会出现在 GitHub 仓库里。
+它保存在你本地的 `更新/` 目录：
+
+```
+F:\我的开发\更新\
+  sync-all.ps1        一次同步前后端两个仓库
+  sync-web.ps1        只同步前端仓库（new-api-web）
+  sync-backend.ps1    只同步后端仓库（new-api-backend）
+```
 
 ### 同步步骤
 
 ```bash
-# 1. 拉取上游并合并（Windows）
-powershell -ExecutionPolicy Bypass -File scripts/sync-upstream.ps1
+# 一次同步两个仓库
+powershell -ExecutionPolicy Bypass -File F:\我的开发\更新\sync-all.ps1
 
-# 2. 检查变更清单，确认后提交
-git commit -m "Merge upstream: 同步 QuantumNous/new-api 更新"
-
-# 3. 推送
-git push origin main
+# 或者只同步其中一个
+powershell -ExecutionPolicy Bypass -File F:\我的开发\更新\sync-backend.ps1
+powershell -ExecutionPolicy Bypass -File F:\我的开发\更新\sync-web.ps1
 ```
 
 先预演、不实际改动：
 
 ```bash
-powershell -ExecutionPolicy Bypass -File scripts/sync-upstream.ps1 -DryRun
+powershell -ExecutionPolicy Bypass -File F:\我的开发\更新\sync-all.ps1 -DryRun
 ```
 
 预演会报告冲突分布，例如：
@@ -294,6 +310,15 @@ powershell -ExecutionPolicy Bypass -File scripts/sync-upstream.ps1 -DryRun
 ==> 冲突总数: 18
 ==> 其中 web/ 目录（将被自动剔除）: 18
 ==> 真正需要人工处理的: 0
+```
+
+合并后检查、提交、推送：
+
+```bash
+cd F:\我的开发\new-api-backend
+git status
+git commit -m "Merge upstream: 同步 QuantumNous/new-api 更新"
+git push origin main
 ```
 
 ### 真冲突了怎么办
