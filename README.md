@@ -254,39 +254,68 @@ bun run dev
 | `upstream`（QuantumNous/new-api）      | 上游原始仓库，用于拉取上游改动          |
 | `main`                         | 二开主分支，包含全部二开改动                 |
 
-后端是整个上游仓库的 fork，所以直接用标准 merge 即可，git 会以共同祖先做三方合并：
+### 为什么要用同步脚本
 
-- 上游改过的文件 → 自动合入
-- 二开改过的文件 → **保留二开版本**（双方都改才会产生冲突）
+上游 `main` 分支**仍然带着完整的 `web/` 目录**，而本仓库早已把前端剥离到独立仓库，
+只保留 `web/.gitignore` 作为「前端产物落点」的占位说明。
+
+直接 `git merge upstream/main` 的实测结果：
+
+- 后端代码（`model/`、`relay/`、`middleware/` 等）**零冲突**，正常合入
+- 冲突 100% 集中在 `web/`，形式为 modify/delete（上游改了 web/ 里的文件，
+  而本仓库删除了整个 web/ 源码）
+
+也就是说，**直接 merge 不会破坏后端二开**，但会把上游的前端源码拖回来，造成
+大量假冲突和目录污染。`scripts/sync-upstream.ps1` 就是为了消掉这一步：
+它做标准三方合并，然后自动把 `web/` 恢复成二开形态。
 
 ### 同步步骤
 
 ```bash
-# 1. 拉取上游
-git fetch upstream
+# 1. 拉取上游并合并（Windows）
+powershell -ExecutionPolicy Bypass -File scripts/sync-upstream.ps1
 
-# 2. 合并上游 main
-git merge upstream/main
+# 2. 检查变更清单，确认后提交
+git commit -m "Merge upstream: 同步 QuantumNous/new-api 更新"
 
-# 3. 解决冲突（如果有）→ git add <文件> && git commit
-
-# 4. 推送
+# 3. 推送
 git push origin main
 ```
 
-冲突时：
+先预演、不实际改动：
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/sync-upstream.ps1 -DryRun
+```
+
+预演会报告冲突分布，例如：
+
+```
+==> 冲突总数: 18
+==> 其中 web/ 目录（将被自动剔除）: 18
+==> 真正需要人工处理的: 0
+```
+
+### 真冲突了怎么办
+
+只有 `web/` **之外**的冲突才需要人工处理（上游和二开改了同一个后端文件）：
 
 ```bash
 git checkout --ours <文件>   # 保留二开版本
 git checkout --theirs <文件> # 采用上游版本
+git add <文件>
 ```
 
 本仓库的二开集中在 `web_assets_stub.go`、`web_assets_embed.go`、`common/`、`setting/`、
 `Dockerfile`、`docker-compose.yml` 与 `docs/deployment/`，上游很少改动这些位置，
-因此同步时基本不会产生冲突。
+因此同步时基本不会产生真冲突。
 
 > **前端同步方式不同**：面板仓库是整个 `web/` 目录的独立 fork，
-> 采用快照基线三方合并，详见 [new-api-web 的同步说明](https://github.com/Bitsea19/new-api-web#%EF%B8%8F-%E5%90%8C%E6%AD%A5%E4%B8%8A%E6%B8%B8-quantumnousnew-api)。
+> 采用快照基线三方合并（取上游 web/ 的更新），详见
+> [new-api-web 的同步说明](https://github.com/Bitsea19/new-api-web#%EF%B8%8F-%E5%90%8C%E6%AD%A5%E4%B8%8A%E6%B8%B8-quantumnousnew-api)。
+>
+> 两个仓库必须**分别同步**：上游改前端 → 同步前端仓库；上游改后端 → 同步后端仓库。
+> 后端同步脚本不会把上游前端代码带进来，前端同步脚本也不会碰后端代码。
 
 ---
 
