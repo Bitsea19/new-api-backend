@@ -4,7 +4,7 @@
 
 > 📖 官方文档：[宝塔面板部署](https://docs.newapi.pro/zh/docs/installation/deployment-methods/bt-docker-installation)
 
-> **本仓库是前后端分离的二开版本**，后端本身不含界面。部署完成后，还需要单独部署前端面板（见 [new-api-web 仓库](https://github.com/你的用户名/new-api-web)）。
+> **本仓库是前后端分离的二开版本**，后端本身不含界面。部署完成后，还需要单独部署前端面板（见 [new-api-web 仓库](https://github.com/Bitsea19/new-api-web)）。
 
 ***
 
@@ -169,11 +169,11 @@ docker compose up -d --build
 ## 相关链接
 
 - [服务器部署指南](../deployment/server-backend.md)
-- [前端部署指南](https://github.com/你的用户名/new-api-web/blob/main/deploy/DEPLOYMENT.md)
+- [前端部署指南](https://github.com/Bitsea19/new-api-web/blob/main/deploy/DEPLOYMENT.md)
 - [官方文档](https://docs.newapi.pro/zh/docs/installation)
 - [环境变量配置](https://docs.newapi.pro/zh/docs/installation/config-maintenance/environment-variables)
 - [常见问题](https://docs.newapi.pro/zh/docs/support/faq)
-- [GitHub 仓库](https://github.com/你的用户名/new-api-backend)
+- [GitHub 仓库](https://github.com/Bitsea19/new-api-backend)
 
 ***
 

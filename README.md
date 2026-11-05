@@ -9,7 +9,7 @@
 > **本仓库是 [QuantumNous/new-api](https://github.com/QuantumNous/new-api) 的二次开发版本。**
 >
 > 主要改动：**将前端面板完全剥离，后端作为纯 API 服务独立部署**。
-> 面板已迁移到独立仓库 [new-api-web](https://github.com/你的用户名/new-api-web)，
+> 面板已迁移到独立仓库 [new-api-web](https://github.com/Bitsea19/new-api-web)，
 > 两个仓库可以分别构建、分别部署、分别升级。
 
 <p align="center">
@@ -145,7 +145,7 @@ bun run dev
 
 > 对接**远程**后端开发时，注意不要把 `VITE_API_BASE_URL` 设成远程地址 —— 那会让请求变成跨域，
 > 而后端的 Refresh Cookie 是 `HttpOnly` + `SameSite=Strict`，跨站带不过去，登录态会断。
-> 保持它为空、只设置代理目标即可。详见[前端仓库的说明](https://github.com/你的用户名/new-api-web)。
+> 保持它为空、只设置代理目标即可。详见[前端仓库的说明](https://github.com/Bitsea19/new-api-web)。
 
 ---
 
@@ -181,7 +181,7 @@ bun run dev
 | 场景 | 文档 |
 | --- | --- |
 | 后端在服务器上本地构建镜像 | [服务器部署指南](./docs/deployment/server-backend.md) |
-| 前后端分离的完整部署（域名、证书、反向代理） | [前端仓库的部署指南](https://github.com/你的用户名/new-api-web/blob/main/deploy/DEPLOYMENT.md) |
+| 前后端分离的完整部署（域名、证书、反向代理） | [前端仓库的部署指南](https://github.com/Bitsea19/new-api-web/blob/main/deploy/DEPLOYMENT.md) |
 | 鉴权、会话与安全配置 | [鉴权与登录会话说明](./docs/authentication.md) |
 | 渠道额外设置 | [渠道额外设置说明](./docs/channel/other_setting.md) |
 | 任务插件开发 | [Task Plugin API v1](./docs/plugin-api/v1.md) |
@@ -236,9 +236,57 @@ bun run dev
 
 后端使用 Go 和 Gin。Go 语言基线见 [go.mod](./go.mod)，容器构建工具链见 [Dockerfile](./Dockerfile)。
 
-前端在独立仓库 [new-api-web](https://github.com/你的用户名/new-api-web)，其技术栈为 React 19、TypeScript、Rsbuild、TanStack 与 Tailwind CSS 4，使用 Bun 管理依赖与脚本。
+前端在独立仓库 [new-api-web](https://github.com/Bitsea19/new-api-web)，其技术栈为 React 19、TypeScript、Rsbuild、TanStack 与 Tailwind CSS 4，使用 Bun 管理依赖与脚本。
 
 贡献前请阅读 [AGENTS.md](./AGENTS.md)。按改动范围执行检查：Go 模块使用 `make test`；前端在面板仓库中运行 `bun check -b`、`bun run lint`、`bun run test` 和 `bun run build`。修改 RelayKit 或 TokenKit 后还必须在对应模块目录下执行 `GOWORK=off go build ./...`。
+
+---
+
+## 🔄 同步上游（QuantumNous/new-api）
+
+本仓库是上游的 fork，需要持续跟进上游的修复与功能。
+
+### 分支结构
+
+| 分支 / 远程                     | 作用                                           |
+| ------------------------------ | ---------------------------------------------- |
+| `origin`（Bitsea19/new-api-backend） | 本仓库的正式仓库，二开版本推送到这里  |
+| `upstream`（QuantumNous/new-api）      | 上游原始仓库，用于拉取上游改动          |
+| `main`                         | 二开主分支，包含全部二开改动                 |
+
+后端是整个上游仓库的 fork，所以直接用标准 merge 即可，git 会以共同祖先做三方合并：
+
+- 上游改过的文件 → 自动合入
+- 二开改过的文件 → **保留二开版本**（双方都改才会产生冲突）
+
+### 同步步骤
+
+```bash
+# 1. 拉取上游
+git fetch upstream
+
+# 2. 合并上游 main
+git merge upstream/main
+
+# 3. 解决冲突（如果有）→ git add <文件> && git commit
+
+# 4. 推送
+git push origin main
+```
+
+冲突时：
+
+```bash
+git checkout --ours <文件>   # 保留二开版本
+git checkout --theirs <文件> # 采用上游版本
+```
+
+本仓库的二开集中在 `web_assets_stub.go`、`web_assets_embed.go`、`common/`、`setting/`、
+`Dockerfile`、`docker-compose.yml` 与 `docs/deployment/`，上游很少改动这些位置，
+因此同步时基本不会产生冲突。
+
+> **前端同步方式不同**：面板仓库是整个 `web/` 目录的独立 fork，
+> 采用快照基线三方合并，详见 [new-api-web 的同步说明](https://github.com/Bitsea19/new-api-web#%EF%B8%8F-%E5%90%8C%E6%AD%A5%E4%B8%8A%E6%B8%B8-quantumnousnew-api)。
 
 ---
 
@@ -247,7 +295,7 @@ bun run dev
 | 资源 | 入口 |
 | --- | --- |
 | 官方文档 | [使用指南](https://docs.newapi.ai/zh/docs) · [安装部署](https://docs.newapi.ai/zh/docs/installation) · [API 参考](https://docs.newapi.ai/zh/docs/api) |
-| 前后端分离部署 | [服务器部署指南](./docs/deployment/server-backend.md) · [前端部署指南](https://github.com/你的用户名/new-api-web/blob/main/deploy/DEPLOYMENT.md) |
+| 前后端分离部署 | [服务器部署指南](./docs/deployment/server-backend.md) · [前端部署指南](https://github.com/Bitsea19/new-api-web/blob/main/deploy/DEPLOYMENT.md) |
 | 鉴权与会话 | [鉴权与登录会话说明](./docs/authentication.md) |
 | 项目导读 | [DeepWiki](https://deepwiki.com/QuantumNous/new-api) |
 | 缺陷与功能建议 | [GitHub Issues](https://github.com/QuantumNous/new-api/issues)（上游） |
@@ -260,7 +308,7 @@ bun run dev
 
 | 项目 | 说明 |
 | --- | --- |
-| [new-api-web](https://github.com/你的用户名/new-api-web) | **配套前端面板**，本二开版本的前端仓库 |
+| [new-api-web](https://github.com/Bitsea19/new-api-web) | **配套前端面板**，本二开版本的前端仓库 |
 | [QuantumNous/new-api](https://github.com/QuantumNous/new-api) | **上游项目**，本仓库的二次开发来源 |
 | [One API](https://github.com/songquanpeng/one-api) | 原版项目基础 |
 | [Midjourney-Proxy](https://github.com/novicezk/midjourney-proxy) | Midjourney 接口支持 |

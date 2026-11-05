@@ -8,7 +8,7 @@
 > 面板完全剥离、后端默认编译为纯 API 服务。因此**不能**直接使用 Docker Hub 上的官方镜像 ——
 > 官方镜像不含 `FRONTEND_BASE_URL`、自定义 CORS 等分离部署能力。
 >
-> 配套前端仓库：[new-api-web](https://github.com/你的用户名/new-api-web)。
+> 配套前端仓库：[new-api-web](https://github.com/Bitsea19/new-api-web)。
 
 ---
 
