@@ -252,25 +252,42 @@ Pin an image version from [Releases](https://github.com/QuantumNous/new-api/rele
 
 The backend uses Go and Gin. The web console uses React 19, TypeScript, Rsbuild, TanStack, and Tailwind CSS 4. Use Bun for frontend dependencies and scripts; see [go.mod](./go.mod) for the Go language baseline and [Dockerfile](./Dockerfile) for the container build toolchain.
 
-Build the frontend before starting the backend, which embeds `web/dist`:
+The console is a separate project, in its own repository. The backend builds as a pure API server by default and carries no frontend bundle. A separated deployment builds and deploys each half on its own, and the two find each other through environment variables:
+
+| Variable | Owned by | Meaning |
+| --- | --- | --- |
+| `FRONTEND_BASE_URL` | Backend | The console's public URL. Browser navigation to the backend redirects here; OAuth callbacks, password-reset links and payment returns use it too. |
+| `API_BASE_URL` | Backend | The backend API's public URL. The image proxy, video content and payment notify callbacks use it. |
+| `CORS_ALLOWED_ORIGINS` | Backend | The exact browser origins allowed to call the API with credentials. Comma-separated, no wildcards. |
+| `VITE_API_BASE_URL` | Frontend | The backend's public URL. Empty means same origin. Baked into the bundle at build time. |
+
+For local development, start the backend first, then the frontend development server in the console's repository (it proxies API requests to port 3000):
 
 ```bash
-# Repository root
-cd web
-bun install --frozen-lockfile
-bun run build
-cd ..
+# Backend repository root
 go run .
 ```
 
-In a second terminal, start the frontend development server:
-
 ```bash
-cd web
+# Frontend repository root
+bun install
 bun run dev -- --port 5173
 ```
 
-Open [http://localhost:5173](http://localhost:5173); the development server proxies API requests to the backend on port 3000. For a containerized development backend, see [docker-compose.dev.yml](./docker-compose.dev.yml) and the `make dev` target in [makefile](./makefile).
+Open [http://localhost:5173](http://localhost:5173). For a containerized development backend, see [docker-compose.dev.yml](./docker-compose.dev.yml) and the `make dev` target in [makefile](./makefile).
+
+The monolith — one binary that also serves the embedded console — is still available, but it needs the frontend's build output:
+
+```bash
+# Frontend repository root
+bun install --frozen-lockfile
+bun run build
+```
+
+```bash
+# Backend repository root; stages the bundle in web/dist, then builds
+make build-embedded
+```
 
 | Location | Responsibility |
 | --- | --- |
@@ -279,10 +296,9 @@ Open [http://localhost:5173](http://localhost:5173); the development server prox
 | `service/`, `model/` | Business logic and persistence |
 | [relaykit/](./relaykit/README.md) | Independently buildable Go module for protocol DTOs and conversions |
 | [plugins/tasks/](./plugins/tasks/) | JavaScript task plugins; see [Task Plugin API v1](./docs/plugin-api/v1.md) for authoring and host boundaries |
-| `web/` | Web console; see [frontend conventions](./web/AGENTS.md) |
 | [electron/](./electron/README.md) | Desktop wrapper and packaging |
 
-Read [AGENTS.md](./AGENTS.md) before contributing. Run checks appropriate to your change, including `make test` for the Go modules and `bun check -b`, `bun run lint`, `bun run test`, and `bun run build` in `web/` for frontend changes. Changes to RelayKit must also pass `GOWORK=off go build ./...` from `relaykit/`.
+Read [AGENTS.md](./AGENTS.md) before contributing. Run checks appropriate to your change, including `make test` for the Go modules and `bun check -b`, `bun run lint`, `bun run test`, and `bun run build` in the console's repository for frontend changes. Changes to RelayKit must also pass `GOWORK=off go build ./...` from `relaykit/`.
 
 <a id="documentation"></a>
 

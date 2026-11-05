@@ -105,7 +105,7 @@ func BuildTaskArtifactContentURL(taskID, artifactKey string) (string, error) {
 
 	baseAddress := strings.TrimSpace(system_setting.TaskPublicAddress)
 	if baseAddress == "" {
-		baseAddress = strings.TrimSpace(system_setting.ServerAddress)
+		baseAddress = strings.TrimSpace(system_setting.APIBaseURL())
 	}
 	if err := ValidateTaskArtifactBaseURL(baseAddress); err != nil {
 		return "", err

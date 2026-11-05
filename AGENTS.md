@@ -22,7 +22,7 @@ This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI pro
 - `relaykit/` is an independent Go module for protocol DTOs and conversions; transport, authentication, database access, and billing stay in the host.
 - `tokenkit/` is an independent Go module for text and image token counting and estimation; request parsing, file loading, and billing stay in the host.
 - JavaScript task plugins live in `plugins/tasks/`, run through `pkg/jsplugin/`, and integrate with host task polling and settlement.
-- `web/` is the React frontend (see `web/AGENTS.md`); `electron/` is the desktop wrapper.
+- `web/` is the build output directory for the React frontend, which now lives in its own repository; `electron/` is the desktop wrapper.
 
 ## Internationalization (i18n)
 
@@ -39,7 +39,7 @@ This is an AI API gateway/proxy built with Go. It aggregates 40+ upstream AI pro
 - Languages: en (base), zh (fallback), zh-TW, fr, ru, ja, vi
 - Translation files: `web/src/i18n/locales/{lang}.json` — flat JSON, keys are English source strings
 - Usage: `useTranslation()` hook, call `t('English key')` in components
-- CLI tools: `bun run i18n:sync` (from `web/`)
+- CLI tools: `bun run i18n:sync` (from the frontend repository)
 
 ## Rules
 
@@ -158,18 +158,21 @@ Tasks that touch none of these (for example unrelated frontend work, authenticat
 
 ### Frontend Rules
 
-- **Reuse existing UI components first (mandatory):** Before implementing or changing frontend UI, read `web/AGENTS.md` and the project `shadcn-ui` skill, search `web/src/components/` and the relevant feature for existing components, and read matching implementations and call sites. Do not start from custom markup or registry installation without checking the repository first.
+The frontend lives in its own repository. Its own `AGENTS.md` holds the detailed conventions — TypeScript, component structure, styling, accessibility, testing, and build checks — and they govern every change to that repository. The rules below cover the boundary between the two.
+
+- **Reuse existing UI components first (mandatory):** Before implementing or changing frontend UI, read the frontend repository's `AGENTS.md` and the project `shadcn-ui` skill, search its `src/components/` and the relevant feature for existing components, and read matching implementations and call sites. Do not start from custom markup or registry installation without checking the repository first.
 - Prefer the project's shared business components over lower-level UI primitives when they cover the use case. Evaluate existing props, composition, and a compatible extension before introducing a replacement. Importing `Button` or `AlertDialog` does not satisfy this rule if the same behavior is already provided by a shared component such as `CopyButton` or `ConfirmDialog`.
-- New implementations of common UI behavior require a concrete capability gap: identify the existing candidates and explain why reuse, composition, or a compatible extension is unsuitable in the change summary or PR description. Different text, dimensions, colors, or feature location alone do not justify duplication. Feature components may compose shared components with business data and actions. Follow the reuse workflow and component entry points in `web/AGENTS.md`; generic library or registry guidance does not override this project-specific priority.
-- Use `bun` as the preferred package manager and script runner for the frontend (`web/`):
+- New implementations of common UI behavior require a concrete capability gap: identify the existing candidates and explain why reuse, composition, or a compatible extension is unsuitable in the change summary or PR description. Different text, dimensions, colors, or feature location alone do not justify duplication. Feature components may compose shared components with business data and actions. Follow the reuse workflow and component entry points in the frontend repository's `AGENTS.md`; generic library or registry guidance does not override this project-specific priority.
+- Use `bun` as the preferred package manager and script runner for the frontend:
   - `bun install` for dependency installation
   - `bun run dev` for development server
   - `bun run build` for production build
   - `bun run i18n:*` for i18n tooling
-- Frontend UI text must support i18n with `i18next`/`react-i18next`. Use flat JSON locale files in `web/src/i18n/locales/{lang}.json`, with English source strings as keys.
+- **The API's address lives in one place:** `src/lib/api-base.ts` in the frontend repository owns the backend's address and the helpers built on it (`apiUrl`, `absoluteApiUrl`, `apiOrigin`). A new request path must go through those helpers rather than through `window.location.origin`, or a separated deployment breaks.
+- **The deployment boundary is two variables:** `VITE_API_BASE_URL` (frontend → backend) and `FRONTEND_BASE_URL` / `API_BASE_URL` / `CORS_ALLOWED_ORIGINS` (backend). The frontend's value is baked in at build time; the backend's come from the environment and must be identical on every node.
+- Frontend UI text must support i18n with `i18next`/`react-i18next`. Use flat JSON locale files in `src/i18n/locales/{lang}.json`, with English source strings as keys.
 - In React components, use `useTranslation()` and call `t('English key')` for user-facing text.
-- **Number formatting and Intl locales (mandatory):** Reuse `@/lib/format` for ordinary number/compact-number display and `@/lib/currency` for monetary values; preserve each formatter's precision and unit semantics. Interface language codes such as `zhCN` / `zhTW` are NOT valid Intl locales. Any interface language passed to `Intl.*`, `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString`, or a locale-aware formatting helper MUST first pass through `toIntlLocale` from `@/i18n/languages`. Do not duplicate language mappings or pass raw language codes through aliases. Follow `web/AGENTS.md` for the lint rule and regression requirements.
-- Follow `web/AGENTS.md` for detailed frontend conventions, including TypeScript, component structure, styling, accessibility, testing, and build checks.
+- **Number formatting and Intl locales (mandatory):** Reuse `@/lib/format` for ordinary number/compact-number display and `@/lib/currency` for monetary values; preserve each formatter's precision and unit semantics. Interface language codes such as `zhCN` / `zhTW` are NOT valid Intl locales. Any interface language passed to `Intl.*`, `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString`, or a locale-aware formatting helper MUST first pass through `toIntlLocale` from `@/i18n/languages`. Do not duplicate language mappings or pass raw language codes through aliases. Follow the frontend repository's `AGENTS.md` for the lint rule and regression requirements.
 
 ### Project Governance
 

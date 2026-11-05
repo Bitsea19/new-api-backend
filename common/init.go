@@ -64,6 +64,12 @@ func InitEnv() {
 	} else {
 		CryptoSecret = SessionSecret
 	}
+	// The frontend config is read first: the session cookie's trusted-origin
+	// list is derived from the frontend's origin, so that origin has to be
+	// known before the cookie settings are validated.
+	if err := InitFrontendConfig(); err != nil {
+		log.Fatal(err)
+	}
 	if err := InitSessionCookieSettings(); err != nil {
 		log.Fatal(err)
 	}

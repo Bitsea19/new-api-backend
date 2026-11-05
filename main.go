@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"embed"
 	"errors"
 	"log"
 	"net/http"
@@ -39,12 +38,6 @@ import (
 
 	_ "net/http/pprof"
 )
-
-//go:embed web/dist
-var buildFS embed.FS
-
-//go:embed web/dist/index.html
-var indexPage []byte
 
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "plugin" {
@@ -189,14 +182,11 @@ func main() {
 	server.Use(middleware.Version())
 	server.Use(middleware.I18n())
 	middleware.SetUpLogger(server)
-	InjectUmamiAnalytics()
-	InjectGoogleAnalytics()
 
 	// 设置路由
-	router.SetRouter(server, router.WebAssets{
-		BuildFS:   buildFS,
-		IndexPage: indexPage,
-	})
+	assets := webAssets()
+	assets.IndexPage = InjectAnalytics(assets.IndexPage)
+	router.SetRouter(server, assets)
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = strconv.Itoa(*common.Port)
@@ -236,7 +226,22 @@ func main() {
 	common.SysLog(common.LogText("server exited"))
 }
 
-func InjectUmamiAnalytics() {
+// InjectAnalytics replaces the analytics placeholders in the embedded
+// index.html with the configured tracking snippets.
+//
+// The placeholders only exist in the embedded (monolith) build, so this is a
+// no-op for the default API-only build, where the frontend owns its own
+// analytics injection.
+func InjectAnalytics(indexPage []byte) []byte {
+	if len(indexPage) == 0 {
+		return indexPage
+	}
+	indexPage = InjectUmamiAnalytics(indexPage)
+	indexPage = InjectGoogleAnalytics(indexPage)
+	return indexPage
+}
+
+func InjectUmamiAnalytics(indexPage []byte) []byte {
 	analyticsInjectBuilder := &strings.Builder{}
 	if os.Getenv("UMAMI_WEBSITE_ID") != "" {
 		umamiSiteID := os.Getenv("UMAMI_WEBSITE_ID")
@@ -253,10 +258,10 @@ func InjectUmamiAnalytics() {
 	analyticsInjectBuilder.WriteString("<!--Umami QuantumNous-->\n")
 	analyticsInject := []byte(analyticsInjectBuilder.String())
 	placeholder := []byte("<!--umami-->\n")
-	indexPage = bytes.ReplaceAll(indexPage, placeholder, analyticsInject)
+	return bytes.ReplaceAll(indexPage, placeholder, analyticsInject)
 }
 
-func InjectGoogleAnalytics() {
+func InjectGoogleAnalytics(indexPage []byte) []byte {
 	analyticsInjectBuilder := &strings.Builder{}
 	if os.Getenv("GOOGLE_ANALYTICS_ID") != "" {
 		gaID := os.Getenv("GOOGLE_ANALYTICS_ID")
@@ -276,7 +281,7 @@ func InjectGoogleAnalytics() {
 	analyticsInjectBuilder.WriteString("<!--Google Analytics QuantumNous-->\n")
 	analyticsInject := []byte(analyticsInjectBuilder.String())
 	placeholder := []byte("<!--Google Analytics-->\n")
-	indexPage = bytes.ReplaceAll(indexPage, placeholder, analyticsInject)
+	return bytes.ReplaceAll(indexPage, placeholder, analyticsInject)
 }
 
 func InitResources() error {
