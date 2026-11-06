@@ -45,7 +45,7 @@ service/openaicompat/chat_responses_live_local_test.go
 go.work
 go.work.sum
 
-# 服务器部署打包产物（由 scripts/package-for-server.ps1 生成）
+# 服务器部署打包产物
 new-api-backend-src.tar.gz
 new-api-backend-src.zip
 new-api-backend.zip

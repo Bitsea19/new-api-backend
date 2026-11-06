@@ -41,7 +41,7 @@
 ### 方法一：从源码构建并用 Compose 启动（推荐）
 
 1. 在宝塔面板中创建网站目录，如 `/www/wwwroot/new-api-backend`
-2. 上传本仓库源码到该目录（可用 `scripts/package-for-server.ps1` 或 `scripts/package-for-server.sh` 打包后上传）
+2. 上传本仓库源码到该目录（可用 `git ls-files -z | tar --null --files-from=- --transform='s,^,new-api-backend/,' -czf new-api-backend-src.tar.gz` 打包后上传，详见[服务器部署指南](../deployment/server-backend.md)）
 3. 编辑目录下的 `docker-compose.yml`：
 
 ```yaml
