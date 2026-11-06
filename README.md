@@ -110,7 +110,7 @@ make build-embedded    # 构建 ../new-api-web 并把产物放进 web/dist 后�
 docker compose up -d --build
 ```
 
-配套脚本 `scripts/package-for-server.ps1`（Windows）/ `scripts/package-for-server.sh`（Linux/macOS）会把源码打包成一个压缩包，直接传到服务器解压即可。完整步骤见 [服务器部署指南](./docs/deployment/server-backend.md)。
+配套打包命令见 [服务器部署指南](./docs/deployment/server-backend.md)。
 
 ---
 
@@ -234,7 +234,6 @@ bun run dev
 | [tokenkit/](./tokenkit/README.md) | 可独立构建的文本与图片 Token 计数 Go 模块 |
 | [plugins/tasks/](./plugins/tasks/) | JavaScript 任务插件；编写方式与宿主边界见 [Task Plugin API v1](./docs/plugin-api/v1.md) |
 | `electron/` | 桌面封装与打包 |
-| `scripts/` | 服务器部署辅助脚本 |
 | `docs/` | 项目文档 |
 
 ---

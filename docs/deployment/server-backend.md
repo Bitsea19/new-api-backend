@@ -31,20 +31,27 @@
 
 ## 2. 打包源码（本地）
 
-```bash
-# Windows PowerShell
-powershell -ExecutionPolicy Bypass -File scripts\package-for-server.ps1
+在仓库根目录执行，把所有 git 已跟踪的文件打成 `new-api-backend-src.tar.gz`：
 
+```bash
 # Linux / macOS
-./scripts/package-for-server.sh
+git ls-files -z | tar --null --files-from=- \
+    --transform='s,^,new-api-backend/,' -czf new-api-backend-src.tar.gz
 ```
 
-产物在仓库的**上一级目录**：`new-api-backend-src.tar.gz`
+```powershell
+# Windows PowerShell
+git ls-files -z | tar --null --files-from=- `
+    --transform='s,^,new-api-backend/,' -czf new-api-backend-src.tar.gz
+```
 
-脚本打包的是 **git 已跟踪文件的当前内容**，所以本地未提交的改动也会被打进去。
-被排除的只有前端代码 —— 前端在独立的 `new-api-web` 仓库，不属于后端。
+产物默认在仓库的**上一级目录**：把 `-czf` 后面改成 `../new-api-backend-src.tar.gz` 即可。
 
-> ⚠️ 如果你用 `zip` 而不是这个脚本，记得手动确认包里**没有** `web/` 目录。
+这样打包的是 **git 已跟踪文件的当前内容**，所以本地未提交的改动也会被打进去。
+前端代码不会被包含 —— 前端在独立的 `new-api-web` 仓库，不属于后端。
+
+> ⚠️ 后端仓库已经不跟踪 `web/` 目录，所以包里不会有前端产物；
+> 如果你用 `zip` 之类的其他方式打包，记得手动确认包里同样**没有** `web/` 目录。
 
 ---
 
