@@ -31,9 +31,10 @@ services:
     restart: always
     command: --log-dir /app/logs
     ports:
-      # Bound to loopback on purpose: the public entry point is the reverse
-      # proxy, which terminates TLS and forwards to the API and the dashboard.
-      - "127.0.0.1:3000:3000"
+      # Published on all interfaces so the API is reachable directly.
+      # Bind to 127.0.0.1 instead when a reverse proxy on the same host is the
+      # only intended entry point.
+      - "3000:3000"
     volumes:
       - ./data:/data
       - ./logs:/app/logs
